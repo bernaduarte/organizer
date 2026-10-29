@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ChevronRight as Go, HeartPulse, Shield } from 'lucide-react';
+import { formatRoutineItem } from '@/config/schema';
 import { useConfig } from '@/config/useConfig';
 import { addDays, daysBetween, fmt } from '@/shared/lib/dates';
 import { PERIOD_LABELS } from '@/shared/lib/dayPlan';
@@ -66,7 +67,11 @@ export function TodayPage() {
             {status === 'neutral' && 'Nada obrigatório hoje'}
           </span>
         </div>
-        <ProgressBar value={counting.length ? doneCount / counting.length : 1} />
+        <ProgressBar
+          value={
+            status === 'recovery' || status === 'minimum' || counting.length === 0 ? 1 : doneCount / counting.length
+          }
+        />
 
         <div className="mt-3 grid grid-cols-2 gap-2">
           <Button
@@ -86,7 +91,7 @@ export function TodayPage() {
             onClick={() => setRecovery(date, !log.recovery)}
           >
             <HeartPulse size={17} />
-            {log.recovery ? 'Em recuperação' : 'Recuperação (dor)'}
+            Dia de recuperação
           </Button>
         </div>
 
@@ -99,8 +104,8 @@ export function TodayPage() {
         )}
         {log.recovery && (
           <p className="mt-2 text-sm text-sky-700 dark:text-sky-300">
-            Dia de recuperação ativo: treino e corrida estão dispensados hoje por conta da dor muscular, sem quebrar sua
-            sequência.
+            Dia de recuperação ativo (caminhada leve + alongamento/bloco de postura): treino e corrida dispensados hoje,
+            contando como dia cumprido na sequência.
           </p>
         )}
       </Card>
@@ -120,7 +125,7 @@ export function TodayPage() {
         </Card>
       )}
 
-      <Card>
+      <Card className="mb-4">
         <CardTitle>Plano do dia</CardTitle>
         {plan.length === 0 && <p className="text-sm text-slate-500">Nada planejado.</p>}
         {plan.map((t) => {
@@ -129,13 +134,18 @@ export function TodayPage() {
             <div key={t.id} className={cn(exempted && 'opacity-60')}>
               <Checkbox
                 checked={!!log.done[t.id]}
-                onChange={t.countsForStreak ? () => toggle(t) : undefined}
+                onChange={t.type === 'rest' ? undefined : () => toggle(t)}
                 label={
                   <span>
                     {t.title}
                     {t.period && (
                       <span className="ml-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-normal text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                         {PERIOD_LABELS[t.period]}
+                      </span>
+                    )}
+                    {!t.countsForStreak && t.type !== 'rest' && (
+                      <span className="ml-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-normal text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                        Opcional
                       </span>
                     )}
                     {exempted && (
@@ -147,7 +157,7 @@ export function TodayPage() {
                 }
                 description={
                   exempted
-                    ? 'Dispensado hoje (recuperação muscular)'
+                    ? 'Dispensado hoje (dia de recuperação)'
                     : log.minimum && t.minimumDescription
                       ? `Mínimo: ${t.minimumDescription}`
                       : t.description
@@ -168,6 +178,35 @@ export function TodayPage() {
           );
         })}
       </Card>
+
+      {config.postureBlock.length > 0 && (
+        <Card>
+          <CardTitle
+            action={
+              <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-normal text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                ~10 min · Opcional
+              </span>
+            }
+          >
+            Bloco de costas e postura
+          </CardTitle>
+          <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">
+            Mini-treino para dias de descanso ou recuperação.
+          </p>
+          {config.postureBlock.map((item) => {
+            const taskId = `posture-${item.id}`;
+            return (
+              <Checkbox
+                key={item.id}
+                label={item.name}
+                description={formatRoutineItem(item)}
+                checked={!!log.done[taskId]}
+                onChange={(v) => markTaskDone(date, taskId, v)}
+              />
+            );
+          })}
+        </Card>
+      )}
     </>
   );
 }

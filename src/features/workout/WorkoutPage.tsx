@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
+import { formatRoutineItem } from '@/config/schema';
 import { useConfig } from '@/config/useConfig';
 import { markTaskDone, useDayLog } from '@/features/today';
 import { alertUser, unlockAudio } from '@/shared/lib/alerts';
@@ -12,7 +13,7 @@ import { ExerciseCard } from './ExerciseCard';
 import { RestTimerBar } from './RestTimerBar';
 import { lastSetsFor, setFinished, updateSet, useAllSessions, useSession } from './session';
 
-/** Tela "Treino": aquecimento, séries com peso/reps e timer de descanso */
+/** Tela "Treino": aquecimento, séries com peso/reps, volta à calma e timer de descanso */
 export function WorkoutPage() {
   const { config } = useConfig();
   const today = useToday();
@@ -22,7 +23,8 @@ export function WorkoutPage() {
   const [chosen, setChosen] = useState<string | null>(null);
   const workout = chosen ?? scheduled;
 
-  const [warmupDone, setWarmupDone] = useState<Record<number, boolean>>({});
+  const [warmupDone, setWarmupDone] = useState<Record<string, boolean>>({});
+  const [cooldownDone, setCooldownDone] = useState<Record<string, boolean>>({});
   const [restSeconds, setRestSeconds] = useState(config.restSeconds[0]);
   const timer = useCountdown(() => alertUser('end'));
 
@@ -92,12 +94,13 @@ export function WorkoutPage() {
       {config.warmup.length > 0 && (
         <Card className="mb-3">
           <CardTitle>Aquecimento</CardTitle>
-          {config.warmup.map((w, i) => (
+          {config.warmup.map((w) => (
             <Checkbox
-              key={w}
-              label={w}
-              checked={!!warmupDone[i]}
-              onChange={(v) => setWarmupDone({ ...warmupDone, [i]: v })}
+              key={w.id}
+              label={w.name}
+              description={formatRoutineItem(w)}
+              checked={!!warmupDone[w.id]}
+              onChange={(v) => setWarmupDone({ ...warmupDone, [w.id]: v })}
             />
           ))}
         </Card>
@@ -117,6 +120,29 @@ export function WorkoutPage() {
           }}
         />
       ))}
+
+      {config.cooldown.length > 0 && (
+        <Card className="mb-3">
+          <CardTitle
+            action={
+              <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-normal text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                Opcional
+              </span>
+            }
+          >
+            Volta à calma
+          </CardTitle>
+          {config.cooldown.map((c) => (
+            <Checkbox
+              key={c.id}
+              label={c.name}
+              description={formatRoutineItem(c)}
+              checked={!!cooldownDone[c.id]}
+              onChange={(v) => setCooldownDone({ ...cooldownDone, [c.id]: v })}
+            />
+          ))}
+        </Card>
+      )}
 
       <Button size="lg" className="mb-20 mt-2 w-full" variant={finished ? 'secondary' : 'primary'} onClick={finish}>
         <CheckCircle2 size={20} />

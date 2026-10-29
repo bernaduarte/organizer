@@ -60,13 +60,13 @@ export function setRecovery(date: ISODate, recovery: boolean) {
 export type DayStatus = 'done' | 'recovery' | 'minimum' | 'partial' | 'missed' | 'neutral';
 
 export function dayStatus(config: RoutineConfig, date: ISODate, log: DayLog | undefined): DayStatus {
+  if (log?.recovery) return 'recovery';
   const allCounting = buildDayTasks(config, date).filter((t) => t.countsForStreak);
   if (allCounting.length === 0) return 'neutral';
 
-  const tasks = log?.recovery ? allCounting.filter((t) => !isPhysicalTask(t)) : allCounting;
-  const doneCount = tasks.filter((t) => log?.done[t.id]).length;
+  const doneCount = allCounting.filter((t) => log?.done[t.id]).length;
 
-  if (doneCount === tasks.length) return log?.recovery ? 'recovery' : 'done';
+  if (doneCount === allCounting.length) return 'done';
   if (log?.minimum) return 'minimum';
   return doneCount > 0 ? 'partial' : 'missed';
 }

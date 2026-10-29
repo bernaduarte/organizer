@@ -20,14 +20,52 @@
     "pattern": [["A", "B", "A"], ["B", "A", "B"]],
     "startDate": "2026-10-19"
   },
-  "warmup": ["Polichinelo", "Rotação de braço", "10 agachamentos sem peso"],
+  "warmup": [
+    { "id": "cat-cow", "name": "Gato-vaca", "reps": "10" },
+    { "id": "hip-flexor-stretch", "name": "Alongamento do flexor do quadril (ajoelhado em afundo)", "durationSeconds": 30, "perSide": true },
+    { "id": "arm-circles", "name": "Rotação de braço", "reps": "10 para frente + 10 para trás" },
+    { "id": "bird-dog", "name": "Bird dog", "sets": 2, "reps": "8", "perSide": true },
+    { "id": "good-morning-bw", "name": "Bom dia sem peso (mãos na cabeça)", "reps": "10" },
+    { "id": "bw-squat", "name": "Agachamento sem peso", "reps": "10" }
+  ],
+  "cooldown": [
+    { "id": "childs-pose", "name": "Postura da criança", "durationSeconds": 30 },
+    { "id": "knees-to-chest", "name": "Joelhos no peito (deitado)", "durationSeconds": 30 },
+    { "id": "hip-flexor-stretch", "name": "Alongamento do flexor do quadril", "durationSeconds": 30, "perSide": true }
+  ],
+  "postureBlock": [
+    { "id": "ytw", "name": "Y-T-W deitado de bruços", "sets": 3, "reps": "8 de cada letra" },
+    { "id": "towel-pulldown", "name": "Puxada com toalha deitado", "sets": 3, "reps": "12" },
+    { "id": "bird-dog", "name": "Bird dog", "sets": 3, "reps": "10", "perSide": true },
+    { "id": "hip-flexor-stretch", "name": "Alongamento do flexor do quadril", "durationSeconds": 30, "perSide": true }
+  ],
   "restSeconds": [60, 90],
   "workouts": {
     "A": [
       { "id": "goblet-squat", "name": "Agachamento goblet", "equipment": "Kettlebell 8kg", "sets": 3, "reps": "12-15" },
-      { "id": "push-up", "name": "Flexão (inclinada ou no chão)", "sets": 3, "reps": "max" },
-      { "id": "barbell-row", "name": "Remada curvada com barra", "sets": 3, "reps": "10-12" },
-      { "id": "romanian-deadlift", "name": "Terra romeno com barra", "sets": 3, "reps": "10-12" },
+      {
+        "id": "push-up",
+        "name": "Flexão (inclinada ou no chão)",
+        "sets": 3,
+        "reps": "max",
+        "notes": "Mãos um pouco mais abertas que os ombros, cotovelos a ~45° do corpo, corpo reto, descer controlando."
+      },
+      {
+        "id": "barbell-row",
+        "name": "Remada curvada com barra",
+        "sets": 3,
+        "reps": "10-12",
+        "notes": "Joelhos levemente dobrados, tronco a ~45°, coluna reta, abdômen contraído, puxar em direção ao umbigo sem dar impulso. Começar só com a barra ou 2kg de cada lado e subir 2kg por vez.",
+        "stopIf": "Parar a série se a coluna arredondar ou o tronco subir. Trocar pela remada unilateral apoiada se a lombar cansar antes das costas ou houver dor/fisgada."
+      },
+      {
+        "id": "stiff",
+        "name": "Stiff com barra",
+        "sets": 3,
+        "reps": "10-12",
+        "notes": "Joelhos destravados, descer só até onde a coluna fica reta (não precisa encostar no chão), carga moderada.",
+        "stopIf": "Parar se a lombar arredondar ou doer. Alternativa: terra romeno ou terra romeno unilateral."
+      },
       { "id": "lateral-raise", "name": "Elevação lateral", "equipment": "Halteres 2-3kg", "sets": 3, "reps": "12-15" },
       { "id": "curl", "name": "Rosca com barra", "sets": 2, "reps": "12" },
       { "id": "plank", "name": "Prancha", "sets": 3, "durationSeconds": "30-45" }

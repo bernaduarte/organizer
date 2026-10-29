@@ -37,6 +37,31 @@ export const planTaskSchema = z.object({
   pagesGoal: z.number().int().positive().optional(), // sobrescreve a meta de leitura do dia
 });
 
+/** Item de aquecimento, volta à calma ou bloco de postura */
+export const routineItemSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    sets: z.number().int().positive().optional(),
+    reps: z.string().optional(),
+    durationSeconds: z.number().int().positive().optional(),
+    perSide: z.boolean().optional(),
+  })
+  .refine((e) => e.reps !== undefined || e.durationSeconds !== undefined, {
+    message: 'Informe "reps" ou "durationSeconds"',
+  });
+
+/**
+ * Aceita também o formato antigo (só o nome, ex.: "Polichinelo"), para que
+ * configs salvas no aparelho ou backups de versões anteriores continuem válidos.
+ */
+const routineListSchema = z.array(
+  z.union([
+    routineItemSchema,
+    z.string().min(1).transform((name) => ({ id: `legacy-${name}`, name })),
+  ]),
+);
+
 /** Exercício de um treino. Use "reps" OU "durationSeconds". */
 export const exerciseSchema = z
   .object({
@@ -47,6 +72,8 @@ export const exerciseSchema = z
     reps: z.string().optional(), // "12-15", "10", "max"
     durationSeconds: z.string().optional(), // "30-45"
     perSide: z.boolean().optional(),
+    notes: z.string().optional(), // dicas de execução
+    stopIf: z.string().optional(), // critérios de parada
   })
   .refine((e) => e.reps !== undefined || e.durationSeconds !== undefined, {
     message: 'Informe "reps" ou "durationSeconds"',
@@ -62,7 +89,9 @@ export const configSchema = z.object({
     pattern: z.array(z.array(z.string().min(1))).min(1),
     startDate: isoDateSchema,
   }),
-  warmup: z.array(z.string()),
+  warmup: routineListSchema,
+  cooldown: routineListSchema.default([]),
+  postureBlock: routineListSchema.default([]),
   restSeconds: z.array(z.number().int().positive()).min(1),
   workouts: z.record(z.string(), z.array(exerciseSchema)),
   progressionRule: z.object({
@@ -97,6 +126,21 @@ export type PlanTask = z.infer<typeof planTaskSchema>;
 export type TaskType = PlanTask['type'];
 export type Period = NonNullable<PlanTask['period']>;
 export type Exercise = z.infer<typeof exerciseSchema>;
+export type RoutineItem = z.infer<typeof routineItemSchema>;
+
+/** Formata descrição de um item de aquecimento, volta à calma ou postura */
+export function formatRoutineItem(item: RoutineItem): string {
+  const parts: string[] = [];
+  if (item.sets) parts.push(`${item.sets} ×`);
+  if (item.reps !== undefined) {
+    const isNumeric = /^\d+(-\d+)?$/.test(item.reps.trim());
+    parts.push(isNumeric ? `${item.reps} reps` : item.reps);
+  } else if (item.durationSeconds !== undefined) {
+    parts.push(`${item.durationSeconds}s`);
+  }
+  if (item.perSide) parts.push('(cada lado)');
+  return parts.join(' ');
+}
 
 /** Valida um objeto qualquer e devolve config ou mensagens de erro legíveis. */
 export function validateConfig(

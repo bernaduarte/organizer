@@ -1,20 +1,40 @@
 import { useState } from 'react';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import type { Exercise } from '@/config/schema';
 import { useConfig } from '@/config/useConfig';
 import { exerciseHistory, useAllSessions } from '@/features/workout';
 import { shortDate } from '@/shared/lib/dates';
 import { Card, CardTitle, Select } from '@/shared/ui';
 import { axisProps, CHART_COLORS, tooltipStyle } from './chartTheme';
 
+const LEGACY_EXERCISE_NAMES: Record<string, string> = {
+  'romanian-deadlift': 'Terra romeno com barra (histórico)',
+};
+
 /** Evolução de um exercício: maior peso e melhor série ao longo do tempo */
 export function ExerciseChart() {
   const { config } = useConfig();
   const sessions = useAllSessions() ?? [];
 
-  // Lista única de exercícios de todos os treinos da config
-  const exercises = Object.values(config.workouts)
+  // Lista única de exercícios de todos os treinos da config + exercícios antigos salvos no banco
+  const configExercises = Object.values(config.workouts)
     .flat()
     .filter((e, i, arr) => arr.findIndex((x) => x.id === e.id) === i);
+  const seenIds = new Set(configExercises.map((e) => e.id));
+  const legacyIds = Array.from(
+    new Set(
+      sessions
+        .flatMap((s) => Object.keys(s.exercises))
+        .filter((id) => !seenIds.has(id) && exerciseHistory(sessions, id).length > 0),
+    ),
+  );
+  const legacyExercises: Exercise[] = legacyIds.map((id) => ({
+    id,
+    name: LEGACY_EXERCISE_NAMES[id] ?? `${id} (histórico)`,
+    sets: 3,
+    reps: '10',
+  }));
+  const exercises = [...configExercises, ...legacyExercises];
   const [exerciseId, setExerciseId] = useState(exercises[0]?.id ?? '');
   const exercise = exercises.find((e) => e.id === exerciseId);
   const data = exerciseHistory(sessions, exerciseId).map((d) => ({ ...d, label: shortDate(d.date) }));

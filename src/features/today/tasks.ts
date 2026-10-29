@@ -96,5 +96,16 @@ export function buildDayTasks(config: RoutineConfig, date: ISODate): DayTask[] {
         tasks.push({ ...base, title: t.title ?? 'Tarefa', countsForStreak: true });
     }
   }
+
+  // 3) Lembrete diário fixo e opcional de alongamento
+  tasks.push({
+    id: 'daily-hip-flexor-stretch',
+    kind: 'plan',
+    type: 'stretch',
+    title: 'Alongar flexor do quadril (30s cada lado)',
+    description: 'Lembrete diário · opcional',
+    countsForStreak: false,
+  });
+
   return tasks;
 }

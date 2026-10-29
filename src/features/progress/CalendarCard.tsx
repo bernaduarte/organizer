@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { addMonths, endOfMonth, format, parseISO, startOfMonth } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, HeartPulse } from 'lucide-react';
 import { useConfig } from '@/config/useConfig';
 import { dayStatus, STATUS_COLORS } from '@/features/today';
 import { db } from '@/shared/db/db';
@@ -56,17 +56,19 @@ export function CalendarCard() {
           const inMonth = d >= first && d <= last;
           const tracked = !!firstLog && d >= firstLog && d <= today;
           const status = dayStatus(config, d, logs.find((l) => l.date === d));
+          const isRecovery = tracked && status === 'recovery';
           return (
             <div
               key={d}
               className={cn(
-                'flex aspect-square items-center justify-center rounded-lg',
+                'flex aspect-square flex-col items-center justify-center rounded-lg leading-none',
                 !inMonth && 'opacity-0',
                 tracked ? STATUS_COLORS[status] : 'bg-slate-100 text-slate-400 dark:bg-slate-900',
                 d === today && 'ring-2 ring-emerald-600',
               )}
             >
-              {fmt(d, 'd')}
+              <span>{fmt(d, 'd')}</span>
+              {isRecovery && <HeartPulse size={10} className="mt-0.5" aria-label="Dia de recuperação" />}
             </div>
           );
         })}
@@ -74,7 +76,7 @@ export function CalendarCard() {
 
       <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
         <Legend className={STATUS_COLORS.done} label="Cumprido" />
-        <Legend className={STATUS_COLORS.recovery} label="Recuperação" />
+        <Legend className={STATUS_COLORS.recovery} label="Recuperação" icon={<HeartPulse size={9} />} />
         <Legend className={STATUS_COLORS.minimum} label="Mínimo" />
         <Legend className={STATUS_COLORS.partial} label="Parcial" />
         <Legend className={STATUS_COLORS.missed} label="Não feito" />
@@ -83,10 +85,11 @@ export function CalendarCard() {
   );
 }
 
-function Legend({ className, label }: { className: string; label: string }) {
+function Legend({ className, label, icon }: { className: string; label: string; icon?: ReactNode }) {
   return (
     <span className="flex items-center gap-1">
-      <span className={cn('inline-block h-3 w-3 rounded', className)} /> {label}
+      <span className={cn('inline-flex h-3.5 w-3.5 items-center justify-center rounded', className)}>{icon}</span>{' '}
+      {label}
     </span>
   );
 }

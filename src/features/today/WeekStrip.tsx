@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
+import { HeartPulse } from 'lucide-react';
 import { useConfig } from '@/config/useConfig';
 import { db } from '@/shared/db/db';
 import { addDays, dayKeyOf, DAY_SHORT, fmt, weekStart } from '@/shared/lib/dates';
@@ -42,7 +43,10 @@ export function WeekStrip({ date, today, onSelect }: { date: string; today: stri
             )}
           >
             <span>{DAY_SHORT[dayKeyOf(d)]}</span>
-            <span className="text-sm font-semibold">{fmt(d, 'd')}</span>
+            <span className="flex items-center gap-0.5 text-sm font-semibold">
+              {fmt(d, 'd')}
+              {!future && !untracked && status === 'recovery' && <HeartPulse size={11} aria-label="Recuperação" />}
+            </span>
           </button>
         );
       })}

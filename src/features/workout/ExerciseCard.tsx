@@ -34,6 +34,8 @@ export function ExerciseCard({ exercise, setCount, sets, last, onChange, onSetDo
 
   // Série que está com o cronômetro de execução rodando (para exercícios por tempo)
   const [activeSet, setActiveSet] = useState<{ index: number; targetSeconds: number } | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
+  const hasInfo = !!(exercise.notes || exercise.stopIf);
   const setTimer = useCountdown(() => {
     alertUser('end');
     if (activeSet !== null) {
@@ -49,11 +51,47 @@ export function ExerciseCard({ exercise, setCount, sets, last, onChange, onSetDo
   return (
     <Card className="mb-3">
       <div className="mb-2">
-        <h3 className="font-semibold">{exercise.name}</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          {targetLabel(exercise, setCount)}
-          {exercise.equipment && ` · ${exercise.equipment}`}
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h3 className="font-semibold">{exercise.name}</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {targetLabel(exercise, setCount)}
+              {exercise.equipment && ` · ${exercise.equipment}`}
+            </p>
+          </div>
+          {hasInfo && (
+            <button
+              type="button"
+              aria-label={`Dicas de ${exercise.name}`}
+              aria-expanded={showInfo}
+              onClick={() => setShowInfo((v) => !v)}
+              className={cn(
+                'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-sm font-semibold transition-colors',
+                showInfo
+                  ? 'border-emerald-600 bg-emerald-600 text-white'
+                  : 'border-slate-300 text-slate-600 hover:border-emerald-500 dark:border-slate-600 dark:text-slate-300',
+              )}
+            >
+              ⓘ
+            </button>
+          )}
+        </div>
+        {showInfo && hasInfo && (
+          <div className="mt-2 space-y-1.5 rounded-xl bg-slate-50 p-3 text-xs text-slate-700 dark:bg-slate-800/70 dark:text-slate-200">
+            {exercise.notes && (
+              <p>
+                <span className="font-semibold text-emerald-700 dark:text-emerald-400">Dicas: </span>
+                {exercise.notes}
+              </p>
+            )}
+            {exercise.stopIf && (
+              <p className="text-amber-800 dark:text-amber-300">
+                <span className="font-semibold">Quando parar: </span>
+                {exercise.stopIf}
+              </p>
+            )}
+          </div>
+        )}
         {last && (
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Última vez ({shortDate(last.date)}): {last.sets.map(formatSet).join(', ')}

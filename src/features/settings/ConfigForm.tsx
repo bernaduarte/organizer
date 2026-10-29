@@ -227,9 +227,6 @@ export function ConfigForm() {
 
       <Section title="Listas (uma por linha)">
         <div className="space-y-3">
-          <Field label="Aquecimento">
-            <LinesTextarea value={draft.warmup} onChange={(v) => update((d) => (d.warmup = v))} />
-          </Field>
           <Field label="Dicas de progressão">
             <LinesTextarea value={draft.progressionRule.tips} onChange={(v) => update((d) => (d.progressionRule.tips = v))} />
           </Field>
@@ -243,7 +240,7 @@ export function ConfigForm() {
       </Section>
 
       <p className="text-xs text-slate-500">
-        Rotação A/B e variantes de corrida são editadas na aba JSON.
+        Aquecimento, volta à calma, bloco de postura, rotação A/B e variantes de corrida são editados na aba JSON.
       </p>
 
       {/* Barra de salvar fixa */}
@@ -352,6 +349,18 @@ function ExerciseEditor({
           <input type="checkbox" checked={!!exercise.perSide} onChange={(e) => onChange({ perSide: e.target.checked || undefined })} />
           Cada lado
         </label>
+        <Input
+          className="col-span-2"
+          value={exercise.notes ?? ''}
+          onChange={(e) => onChange({ notes: e.target.value || undefined })}
+          placeholder="Dicas de técnica (opcional)"
+        />
+        <Input
+          className="col-span-2"
+          value={exercise.stopIf ?? ''}
+          onChange={(e) => onChange({ stopIf: e.target.value || undefined })}
+          placeholder="Critérios de parada (opcional)"
+        />
       </div>
       <RemoveButton onClick={onRemove} />
     </div>
