@@ -82,4 +82,4 @@ Regras que valem a pena saber:
 - **Datas** são strings `AAAA-MM-DD` calculadas no fuso da config (`America/Sao_Paulo`).
 - **Dia cumprido:** todas as tarefas do plano feitas (aulas e descanso não contam), ou a versão mínima ativada. Concluir o treino, salvar o trote ou bater a meta de páginas marca a tarefa sozinho.
 - **Sequência:** hoje ainda em andamento não quebra a sequência; dias sem tarefas não somam nem quebram.
-- **Banco:** se mudar os índices em `shared/db/db.ts`, crie uma `this.version(2)` em vez de editar a versão 1.
+- **Banco:** se mudar os índices em `shared/db/db.ts`, crie uma `this.version(2)` em vez de editar a versão 1. 
