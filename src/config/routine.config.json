@@ -3,30 +3,37 @@
   "schedule": [
     {
       "day": "mon",
-      "title": "Aula",
+      "title": "Estudo",
       "start": "07:00",
       "end": "13:00",
       "type": "class"
     },
     {
       "day": "tue",
-      "title": "Aula",
-      "start": "19:00",
-      "end": "20:00",
+      "title": "Estudo",
+      "start": "07:00",
+      "end": "13:00",
       "type": "class"
     },
     {
       "day": "wed",
-      "title": "Aula",
+      "title": "Estudo",
       "start": "07:00",
       "end": "13:00",
       "type": "class"
     },
     {
       "day": "thu",
-      "title": "Aula",
-      "start": "18:00",
-      "end": "22:00",
+      "title": "Estudo",
+      "start": "07:00",
+      "end": "13:00",
+      "type": "class"
+    },
+    {
+      "day": "fri",D
+      "title": "Estudo",
+      "start": "07:00",
+      "end": "13:00",
       "type": "class"
     }
   ],
